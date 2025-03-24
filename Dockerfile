@@ -2,11 +2,10 @@ ARG NETBOX_VERSION=latest
 
 FROM netboxcommunity/netbox:${NETBOX_VERSION}
 
+RUN <<EOF
+apt-get update
+apt-get install -y postgres-client
+EOF
 
-COPY plugins/ /plugins/
-# RUN /opt/netbox/venv/bin/pip install --editable /plugin/test-plugin
-
-COPY dev-entrypoint.sh /opt/dev-entrypoint.sh
-
-# WORKDIR /opt/netbox/netbox
-ENTRYPOINT ["/opt/dev-entrypoint.sh"]
+COPY entrypoint.sh /opt/entrypoint.sh
+ENTRYPOINT ["/opt/entrypoint.sh"]
