@@ -1,4 +1,3 @@
-
 services:
   worker: &netbox
     build:
@@ -6,18 +5,24 @@ services:
       dockerfile: ./Dockerfile
       args:
         NETBOX_VERSION: latest
-    command: sh -c "python manage.py rqworker"
-    env_file: ./env/netbox.env
+    command:
+      - /opt/netbox/venv/bin/python
+      - /opt/netbox/netbox/manage.py
+      - rqworker
+    env_file: env/netbox.env
     depends_on:
       netbox:
         condition: service_healthy
     volumes:
       - ./configuration/configuration.py:/opt/netbox/netbox/netbox/configuration.py
-      - ./plugins/:/plugins/
+      - ./plugins/:/opt/plugins/
   netbox:
     <<: *netbox
-    command: >
-      sh -c "python manage.py runserver 0.0.0.0:8000"
+    command:
+      - /opt/netbox/venv/bin/python
+      - /opt/netbox/netbox/manage.py
+      - runserver
+      - 0.0.0.0:8000
     ports:
       - "8000:8000"
     healthcheck:
@@ -27,23 +32,35 @@ services:
       interval: 15s
     depends_on:
       - postgres
-      - redis
-
+      - valkey
   postgres:
-    image: postgres:14-alpine
-    env_file: ./env/postgres.env
+    image: docker.io/postgres:17-alpine
+    healthcheck:
+      test: pg_isready -q -t 2 -d $$POSTGRES_DB -U $$POSTGRES_USER
+      start_period: 20s
+      timeout: 30s
+      interval: 10s
+      retries: 5
+    env_file: env/postgres.env
     volumes:
-      - pgdata-data:/var/lib/postgresql/data
-
-  redis:
-    image: redis:7-alpine
-    command: sh -c "redis-server --appendonly yes --requirepass redis"
-    env_file: ./env/redis.env
+      - postgres-data:/var/lib/postgresql/data
+  valkey:
+    image: docker.io/valkey/valkey:8.0-alpine
+    command:
+      - /usr/local/bin/valkey-server
+      - --appendonly yes
+      - --requirepass netbox
+    healthcheck:
+      test: '[ $$(valkey-cli --pass "netbox" ping) = ''PONG'' ]'
+      start_period: 5s
+      timeout: 3s
+      interval: 1s
+      retries: 5
     volumes:
-      - redis-data:/data
+      - valkey-data:/data
 
 volumes:
-  pgdata-data:
+  postgres-data:
     driver: local
-  redis-data:
-    driver: local #   driver: local
+  valkey-data:
+    driver: local
