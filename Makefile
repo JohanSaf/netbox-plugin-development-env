@@ -6,23 +6,13 @@ help:
 	@echo 'Usage:'
 	@sed -n 's/^##//p' ${MAKEFILE_LIST} | column -t -s ':' |  sed -e 's/^/ /'
 
-## build: build the container
-.PHONY: build
-build: clean netbox/.git
-	@docker compose build
-
 netbox/.git:
 	@git clone --single-branch --branch=${VERSION} https://github.com/netbox-community/netbox.git netbox/
 
-## update: update the netbox git repo
-.PHONY: update
-update: netbox/.github
-	@cd netbox && git pull
-
-## run: run the containers
+## run: build and run the containers
 .PHONY: run
-run:
-	@docker compose up
+run: netbox/.git
+	@docker compose up --build
 
 ## restart: restart the containers
 .PHONY: restart
