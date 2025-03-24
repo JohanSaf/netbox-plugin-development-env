@@ -8,7 +8,7 @@ help:
 
 ## build: build the container
 .PHONY: build
-build: netbox/.git
+build: clean netbox/.git
 	@docker compose build
 
 netbox/.git:
