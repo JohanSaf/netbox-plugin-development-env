@@ -1,58 +1,67 @@
 VERSION := $(or $(NETBOX_VERSION),master)
-VENV :=$(shell pwd -P)/netbox/venv
-PYTHON :=$(shell which python3)
 
+## help: print this help message
+.PHONY: help
+help:
+	@echo 'Usage:'
+	@sed -n 's/^##//p' ${MAKEFILE_LIST} | column -t -s ':' |  sed -e 's/^/ /'
 
-PHONY: help
-help: # Show help for each of the Makefile recipes.
-	@grep -E '^[a-zA-Z0-9 -]+:.*#'  Makefile | sort | while read -r l; do printf "\033[1;32m$$(echo $$l | cut -f 1 -d':')\033[00m:$$(echo $$l | cut -f 2- -d'#')\n"; done
-
-.PHONY: all 
-all: build venv## Build and install
-
+## build: build the container
 .PHONY: build
-build: netbox/.git #Clone the repo Build the docker containers
-	sudo docker compose build
-	
+build: netbox/.git
+	@docker compose build
+
 netbox/.git:
-	git clone --single-branch --branch=${VERSION} https://github.com/netbox-community/netbox.git netbox/
+	@git clone --single-branch --branch=${VERSION} https://github.com/netbox-community/netbox.git netbox/
 
-.PHONY: venv
-venv: netbox/requirements.txt  #Create a virtual environment and install the requirements
-	${PYTHON} -m venv ${VENV}
-	${VENV}/bin/pip install --upgrade pip
-	${VENV}/bin/pip install -r netbox/requirements.txt
-	
+## update: update the netbox git repo
 .PHONY: update
-update: netbox/.github #Update the repo
-	cd netbox && git pull
-	
+update: netbox/.github
+	@cd netbox && git pull
+
+## run: run the containers
 .PHONY: run
-run: #Run the containers
-	sudo docker compose up
+run:
+	@docker compose up
 
+## restart: restart the containers
+.PHONY: restart
+restart:
+	@docker compose restart
+
+## stop: stop the containers
 .PHONY: stop
-stop: #Stop the containers
-	sudo docker compose down
+stop:
+	@docker compose down
 
+## open: open netbox in the web browser (macos only)
+.PHONY: open
+open:
+	@open http://localhost:8000
+
+## clean: remove the local netbox clone, docker containers and associated volumes
 .PHONY: clean
-clean: #Remove netbox files, docker containers, and postgres data
-	rm -rf netbox
-	sudo docker compose down --volumes --rmi all
+clean:
+	@rm -rf netbox
+	@docker compose down --volumes --rmi all
 
+## migrations: create migrations, use PLUGIN=plugin_name to create migrations for a plugin
 .PHONY: migrations
-migrations: #Create migrations, use PLUGIN=plugin_name to create migrations for a plugin
-	sudo docker compose exec netbox /opt/netbox/netbox/manage.py makemigrations ${PLUGIN}
+migrations:
+	@docker compose exec netbox /opt/netbox/netbox/manage.py makemigrations ${PLUGIN}
 
+## migrate: apply migrations
 .PHONY: migrate
-migrate: #Apply migrations
-	sudo docker compose exec netbox /opt/netbox/netbox/manage.py migrate
-	
+migrate:
+	@docker compose exec netbox /opt/netbox/netbox/manage.py migrate
+
+## nbshell: execute the netbox shell
 .PHONY: nbshell
-nbshell: #Run the netbox shell
-	sudo docker compose exec netbox /opt/netbox/netbox/manage.py nbshell
-	
+nbshell:
+	@docker compose exec netbox /opt/netbox/netbox/manage.py nbshell
+
+## dbshell: execute the postgres database shell
 .PHONY: dbshell
-dbshell: #Run the database shell
-	sudo docker compose exec netbox /opt/netbox/netbox/manage.py dbshell
-	
+dbshell:
+	@docker compose exec netbox /opt/netbox/netbox/manage.py dbshell
+
