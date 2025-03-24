@@ -4,7 +4,7 @@ FROM netboxcommunity/netbox:${NETBOX_VERSION}
 
 RUN <<EOF
 apt-get update
-apt-get install -y postgres-client
+apt-get install -y postgresql-client
 EOF
 
 COPY entrypoint.sh /opt/entrypoint.sh
