@@ -15,25 +15,20 @@ The project is still young at this point and I'm using it regularly in my workfl
 
 
 ## Install
-
 ### Quickstart
 ```bash
-git clone git@github.com:dkraklan/netbox-plugin-development-env.git
-make build
+git clone git@github.com:JohanSaf/netbox-plugin-development-env.git
 make run
 ```
 You will now have a local instance of netbox runinng on http://127.0.0.1:8000 , username and password are defiend in the `netbox.env`file.
 
 ### Setting up your plugin
-
 Clone your plugin into the `plugins/` directory. Then edit the `configuration/configuration.py` file and add your plugin to the plugins section.
 ```bash
-make build
 make run
 ```
 
 ### Migrations
-
 When you need to make further migrations during devleopment you can do that with the make options.
 ```bash
 make migrations #Generate core migrations
@@ -45,6 +40,22 @@ You can also drop into the dbshell and nbshell.
 ```bash
 make dbshell
 make nbshell
+```
+
+## Usage
+This commands are available using the `Makefile`:
+```
+Usage:
+  help         print this help message
+  run          build and run the containers
+  restart      restart the containers
+  stop         stop the containers
+  open         open netbox in the web browser (macos only)
+  clean        remove the local netbox clone, docker containers and associated volumes
+  migrations   create migrations, use PLUGIN=plugin_name to create migrations for a plugin
+  migrate      apply migrations
+  nbshell      execute the netbox shell
+  dbshell      execute the postgres database shell
 ```
 
 ## Credits
