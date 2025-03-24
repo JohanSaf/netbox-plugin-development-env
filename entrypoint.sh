@@ -10,12 +10,8 @@ umask 002
 # shellcheck disable=SC1091
 source /opt/netbox/venv/bin/activate
 
-INSTALL_CMD="/opt/netbox/venv/bin/pip install"
-NETBOX_PLUGIN_DIR="${NETBOX_PLUGINS_DIR:-/plugins/}"
-
-if [[ $DEVELOPMENT = "true" ]]; then
-INSTALL_CMD="$INSTALL_CMD -e"
-fi
+INSTALL_CMD="/opt/netbox/venv/bin/pip install -e"
+NETBOX_PLUGIN_DIR="${NETBOX_PLUGINS_DIR:-/opt/plugins/}"
 
 for plugin in $(find $NETBOX_PLUGIN_DIR -mindepth 1 -maxdepth 1 -type d);
 do
