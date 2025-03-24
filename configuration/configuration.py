@@ -35,9 +35,7 @@ DEVELOPER = os.environ.get("DEVELOPER", "true")
 
 INTERNAL_IPS = ("0.0.0.0", "127.0.0.1", "::1")
 
-PLUGINS = [
-]
-PLUGINS_CONFIG = {
-}
+PLUGINS = []
+PLUGINS_CONFIG = {}
 
 SCRIPTS_ROOT = "scripts"
