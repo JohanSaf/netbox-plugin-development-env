@@ -19,6 +19,10 @@ run: netbox/.git
 restart:
 	@docker compose restart
 
+## rebuild: stop, rebuilt and start the containers
+.PHONY: rebuild
+rebuild: stop clean run
+
 ## stop: stop the containers
 .PHONY: stop
 stop:
