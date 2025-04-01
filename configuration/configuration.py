@@ -32,6 +32,7 @@ REDIS = {
 DEBUG = os.environ.get("DEBUG", "true")
 DEVELOPER = os.environ.get("DEVELOPER", "true")
 
+CENSUS_REPORTING_ENABLED = False
 
 INTERNAL_IPS = ("0.0.0.0", "127.0.0.1", "::1")
 
