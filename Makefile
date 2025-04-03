@@ -49,6 +49,11 @@ migrations:
 migrate:
 	@docker compose exec netbox /opt/netbox/netbox/manage.py migrate
 
+## reindex: reindex database
+.PHONY: reindex
+reindex:
+	@docker compose exec netbox /opt/netbox/netbox/manage.py reindex
+
 ## nbshell: execute the netbox shell
 .PHONY: nbshell
 nbshell:
